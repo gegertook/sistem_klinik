@@ -55,8 +55,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/tagihan/{tagihan}/manual', [TagihanController::class, 'payManual'])
         ->name('tagihan.manual')
         ->middleware('role:admin,kasir');
+    Route::post('/tagihan/{tagihan}/bpjs', [TagihanController::class, 'payBpjs'])
+        ->name('tagihan.bpjs')
+        ->middleware('role:admin,kasir');
     Route::post('/tagihan/{tagihan}/midtrans', [TagihanController::class, 'payOnline'])
         ->name('tagihan.midtrans')
+        ->middleware('role:admin,kasir,pasien');
+    Route::post('/tagihan/{tagihan}/midtrans/sync', [TagihanController::class, 'syncMidtransStatus'])
+        ->name('tagihan.midtrans.sync')
         ->middleware('role:admin,kasir,pasien');
 
     Route::middleware('role:admin,kepala_klinik')->group(function () {

@@ -12,7 +12,7 @@
                     <select id="pasien_id" name="pasien_id" required>
                         <option value="">Pilih pasien</option>
                         @foreach ($pasien as $row)
-                            <option value="{{ $row->id }}" @selected((string) old('pasien_id', $kunjungan?->pasien_id) === (string) $row->id)>
+                            <option value="{{ $row->id }}" @selected((string) old('pasien_id', $kunjungan?->pasien_id ?? $selectedPasienId ?? null) === (string) $row->id)>
                                 {{ $row->nama_pasien }} - {{ $row->no_rm }}
                             </option>
                         @endforeach

@@ -41,29 +41,24 @@
         <div class="grid grid-2 no-print">
             @if (in_array(auth()->user()->role, ['admin', 'kasir'], true))
                 <div class="panel">
-                    <h2>Pembayaran Manual</h2>
-                    <form method="post" action="{{ route('tagihan.manual', $tagihan) }}">
+                    <h2>BPJS</h2>
+                    <form method="post" action="{{ route('tagihan.bpjs', $tagihan) }}">
                         @csrf
-                        <div class="field">
-                            <label for="metode_pembayaran">Metode</label>
-                            <select id="metode_pembayaran" name="metode_pembayaran">
-                                <option value="Tunai">Tunai</option>
-                                <option value="Transfer">Transfer</option>
-                                <option value="Debit">Debit</option>
-                            </select>
-                        </div>
-                        <button class="btn primary" type="submit">Proses Manual</button>
+                        <button class="btn primary" type="submit">Proses BPJS</button>
                     </form>
                 </div>
             @endif
             <div class="panel">
-                <h2>Midtrans</h2>
+                <h2>Mandiri</h2>
                 @if ($tagihan->snap_token && $midtransClientKey)
-                    <button id="pay-button" class="btn warning" type="button">Bayar Online</button>
+                    <div class="actions">
+                        <button id="pay-button" class="btn warning" type="button">Bayar Mandiri</button>
+                        <button id="sync-payment-button" class="btn secondary" type="button">Cek Status Mandiri</button>
+                    </div>
                 @else
                     <form method="post" action="{{ route('tagihan.midtrans', $tagihan) }}">
                         @csrf
-                        <button class="btn warning" type="submit">Buat Pembayaran Online</button>
+                        <button class="btn warning" type="submit">Buat Pembayaran Mandiri</button>
                     </form>
                 @endif
             </div>
@@ -93,8 +88,30 @@
     @if ($tagihan->snap_token && $midtransClientKey && $tagihan->status_pembayaran !== 'Berhasil Dibayar')
         <script src="{{ $isMidtransProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ $midtransClientKey }}"></script>
         <script>
+            const syncPaymentStatus = function () {
+                return fetch(@json(route('tagihan.midtrans.sync', $tagihan)), {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': @json(csrf_token()),
+                    },
+                }).finally(function () {
+                    window.location.reload();
+                });
+            };
+
+            document.getElementById('sync-payment-button')?.addEventListener('click', function () {
+                this.disabled = true;
+                syncPaymentStatus();
+            });
+
             document.getElementById('pay-button')?.addEventListener('click', function () {
-                window.snap.pay(@json($tagihan->snap_token));
+                window.snap.pay(@json($tagihan->snap_token), {
+                    onSuccess: syncPaymentStatus,
+                    onPending: syncPaymentStatus,
+                    onError: syncPaymentStatus,
+                    onClose: syncPaymentStatus,
+                });
             });
         </script>
     @endif

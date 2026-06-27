@@ -37,6 +37,9 @@
                     @endforeach
                     <td>
                         <div class="actions">
+                            @if ($resource === 'pasien')
+                                <a class="btn primary" href="{{ route('kunjungan.create', ['pasien_id' => $item->id]) }}">Daftar Kunjungan</a>
+                            @endif
                             <a class="btn secondary" href="{{ route('master.edit', [$resource, $item->id]) }}">Ubah</a>
                             <form action="{{ route('master.destroy', [$resource, $item->id]) }}" method="post" onsubmit="return confirm('Hapus data ini?')">
                                 @csrf

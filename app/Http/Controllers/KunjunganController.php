@@ -34,13 +34,16 @@ class KunjunganController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $selectedPasienId = $request->integer('pasien_id');
+
         return view('kunjungan.form', [
             'pasien' => Pasien::orderBy('nama_pasien')->get(),
             'poli' => Poli::where('status', 'Aktif')->orderBy('nama_poli')->get(),
             'dokter' => Dokter::with('poli')->where('status', 'Aktif')->orderBy('nama_dokter')->get(),
             'kunjungan' => null,
+            'selectedPasienId' => Pasien::whereKey($selectedPasienId)->exists() ? $selectedPasienId : null,
         ]);
     }
 

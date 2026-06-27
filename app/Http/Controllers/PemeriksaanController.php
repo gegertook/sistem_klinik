@@ -112,7 +112,9 @@ class PemeriksaanController extends Controller
             ])->save();
         });
 
-        return redirect()->route('tagihan.index')->with('success', 'Pemeriksaan disimpan dan tagihan berhasil dibuat.');
+        return redirect()
+            ->route('pemeriksaan.show', $kunjungan)
+            ->with('success', 'Pemeriksaan disimpan dan tagihan berhasil dibuat.');
     }
 
     public function show(Kunjungan $kunjungan)

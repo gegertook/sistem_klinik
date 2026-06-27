@@ -61,7 +61,13 @@ class MasterDataController extends Controller
             $data['kode_dokter'] = $this->nextNumber(Dokter::class, 'kode_dokter', 'DR');
         }
 
-        $config['model']::create($data);
+        $item = $config['model']::create($data);
+
+        if ($resource === 'pasien' && auth()->user()->role === 'pendaftaran') {
+            return redirect()
+                ->route('kunjungan.create', ['pasien_id' => $item->id])
+                ->with('success', 'Pasien berhasil ditambahkan. Lanjutkan pendaftaran kunjungan.');
+        }
 
         return redirect()->route('master.index', $resource)->with('success', $config['singular'].' berhasil ditambahkan.');
     }
